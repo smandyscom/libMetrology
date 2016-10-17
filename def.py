@@ -14,5 +14,7 @@ def PositionSymbol(subscript):
 def VectorSymbol(subscript):
     pass
 
+print "Debugging"
 if __name__ == '__main__':
+    print "Debugging.."
     print Matrix(HomogenousTransformationSymbol('cs') * HomogenousTransformationSymbol('sr'))
