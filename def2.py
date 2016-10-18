@@ -1,19 +1,20 @@
-from numpy import *
+from numpy import matlib,linalg
+import numpy
 from ikpy import geometry_utils as gu
 
 def is_Orthogonal(m):
     QTQ = m.T*m
     QQT = m*m.T
-    print "QTQ{0}QQT{1}".format(QTQ,QQT)
-    return allclose(QTQ,identity(QTQ.shape[0]))
+    # print "QTQ{0}QQT{1}".format(QTQ,QQT)
+    return numpy.allclose(QTQ, matlib.identity(QTQ.shape[0]))
 
 def force_vector_unity(vec):
     return (1/linalg.norm(vec)) * vec
 
 
-class HomogenousTransformation(matrix):
+class HomogenousTransformation(numpy.matrix):
     def __new__(self,**kwargs):
-        self = identity(4)
+        self = matlib.identity(4)
         if 'RP' in kwargs:
             R,P = kwargs['RP']
             for i in range(0,3):
@@ -24,8 +25,8 @@ class HomogenousTransformation(matrix):
             self[0:3,3]=P
         elif 'xyzabc' in kwargs:
             x,y,z,a,b,c = kwargs['xyzabc']
-            R = matrix(gu.Rz_matrix(c)*gu.Ry_matrix(b)*gu.Rx_matrix(a))
-            P = matrix([x,y,z])
+            R = numpy.matrix(gu.Rz_matrix(c)*gu.Ry_matrix(b)*gu.Rx_matrix(a))
+            P = numpy.matrix([x,y,z]).T
             self = HomogenousTransformation(RP=(R,P))
         else:
             pass
@@ -34,9 +35,9 @@ class HomogenousTransformation(matrix):
         #
         return self
 
-    def __init__(self):
-        self.__R=self[0:3,0:3]
-        self.__P=self[0:3,3]
+    # def __init__(self):
+        # self.__R=self[0:3,0:3]
+        # self.__P=self[0:3,3]
     #def __init__(self,*args,**kwargs):
         #super(HomogenousTransformation,self).__init__(*args,**kwargs)
         #given artibary matrix , check properties of HTM
@@ -46,23 +47,25 @@ class HomogenousTransformation(matrix):
         return self.__is_R_unity() and self.__is_R_rank3()
 
 
-class PositionVector(matrix):
-    def __new__(self,px=0.,py=0.,pz=0.,scale=1.):
-        self = matrix([px,py,pz,scale])
+class PositionVector(numpy.matrix):
+    def __new__(self, px=0., py=0., pz=0., scale=1.):
+        self = numpy.matrix([px, py, pz, scale], dtype=float)
         return self.T
 
 if __name__ == '__main__':
-    print is_Orthogonal(matrix([[1,0],[0,1]]))
-    print force_vector_unity(matrix([1,1,1]))
-    R = identity(3) *2
-    P = matrix([1,1,1])
+    print is_Orthogonal(numpy.matrix([[1,0],[0,1]]))
+    print force_vector_unity(numpy.matrix([1,1,1]))
+    R = matlib.identity(3) *2
+    P = numpy.matrix([1,1,1])
+    P = P.T
+    print 'P{0}'.format(P)
     print HomogenousTransformation(RP=(R,P))
     print HomogenousTransformation(xyzabc=(1,2,3,3.14,1.57,0))
     P = PositionVector(0,0,0,1)
     print P
-    P = matrix([1,1,1])
+    P = numpy.matrix([1,1,1])
     # R = matrix([[1,0,0],[0,1,1],[0,0,1]])
-    R=identity(3)
+    R=numpy.identity(3)
     R[1:2]=1
     print 'R{0}'.format(R)
     print 'RT{0}'.format(R.T)
