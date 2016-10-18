@@ -65,10 +65,14 @@ if __name__ == '__main__':
     print P
     P = numpy.matrix([1,1,1])
     # R = matrix([[1,0,0],[0,1,1],[0,0,1]])
-    R=numpy.identity(3)
+    #Note : ndarray * as element multiplication , rather matlib * as matrix multiplication
+    R=matlib.identity(3)
     R[1:2]=1
     print 'R{0}'.format(R)
     print 'RT{0}'.format(R.T)
     print 'RTR{0}'.format(R.T*R)
     print is_Orthogonal(R)
     # print HomogenousTransformation(RP=(R,P))
+    print HomogenousTransformation(xyzabc=(1,2,3,0,0,0)) * PositionVector(1,1,1,1)
+    seed=(1,1,1,3.14,3.14,3.14)
+    print HomogenousTransformation(xyzabc=seed) * HomogenousTransformation(xyzabc=seed).I
