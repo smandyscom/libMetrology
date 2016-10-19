@@ -34,17 +34,12 @@ class HomogenousTransformation(numpy.matrix):
         # Euler sequence : translate xyz -> rotate about x alpha radians -> rotate about y
         #
         return self
+    @property 
+    def R(self):
+        return self[0:3,0:3]
+    def P(self):
+        return self[0:3,3]
 
-    # def __init__(self):
-        # self.__R=self[0:3,0:3]
-        # self.__P=self[0:3,3]
-    #def __init__(self,*args,**kwargs):
-        #super(HomogenousTransformation,self).__init__(*args,**kwargs)
-        #given artibary matrix , check properties of HTM
-
-    def is_valid(self):
-        #check out if the matrix satisfied HTM properties
-        return self.__is_R_unity() and self.__is_R_rank3()
 
 
 class PositionVector(numpy.matrix):
