@@ -25,7 +25,7 @@ class HomogenousTransformation(numpy.matrix):
             self[0:3,3]=P
         elif 'xyzabc' in kwargs:
             x,y,z,a,b,c = kwargs['xyzabc']
-            R = numpy.matrix(gu.Rz_matrix(c)*gu.Ry_matrix(b)*gu.Rx_matrix(a))
+            R = numpy.matrix(gu.Rz_matrix(c))*numpy.matrix(gu.Ry_matrix(b))*numpy.matrix(gu.Rx_matrix(a))
             P = numpy.matrix([x,y,z]).T
             self = HomogenousTransformation(RP=(R,P))
         else:
@@ -34,9 +34,15 @@ class HomogenousTransformation(numpy.matrix):
         # Euler sequence : translate xyz -> rotate about x alpha radians -> rotate about y
         #
         return self
-    @property 
+
+    def __init__(self):
+        pass
+
+    @property
     def R(self):
         return self[0:3,0:3]
+
+    @property
     def P(self):
         return self[0:3,3]
 
@@ -71,3 +77,5 @@ if __name__ == '__main__':
     print HomogenousTransformation(xyzabc=(1,2,3,0,0,0)) * PositionVector(1,1,1,1)
     seed=(1,1,1,3.14,3.14,3.14)
     print HomogenousTransformation(xyzabc=seed) * HomogenousTransformation(xyzabc=seed).I
+    print HomogenousTransformation(xyzabc=seed).R
+
