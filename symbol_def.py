@@ -14,7 +14,7 @@ def VectorSymbol(subscript):
     pass
 
 def Rz_Matrix(theta):
-    return Matrix([[1,theta,0],
+    return Matrix([[cos(theta),-sin(theta),0],
     [sin(theta),cos(theta),0],
     [0,0,1]])
 

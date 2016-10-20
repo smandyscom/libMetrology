@@ -1,4 +1,4 @@
-import def2
+import numeric_def
 import numpy
 from numpy import random as rd
 PI=numpy.pi
@@ -9,17 +9,17 @@ def vp_set(p_set):
     vp_set_ = numpy.matrix(numpy.hstack((vp_set_,p_set[:,0])))
     return vp_set_
 
-p_s = def2.PositionVector(0, 0, 10)
+p_s = numeric_def.PositionVector(0, 0, 10)
 
 
 def T_s_s0(axes_coordinate):
-    return def2.HomogenousTransformation(xyzabc=axes_coordinate)
+    return numeric_def.HomogenousTransformation(xyzabc=axes_coordinate)
 
 
 def T_s0_r(X, Y=10, Z=10, a=0, b=0, c=0):
-    return def2.HomogenousTransformation(xyzabc=(X, Y, Z, a, b, c))
+    return numeric_def.HomogenousTransformation(xyzabc=(X, Y, Z, a, b, c))
 
-T_c_r_nominal = def2.HomogenousTransformation(xyzabc=(100,100,100,0,0,0))
+T_c_r_nominal = numeric_def.HomogenousTransformation(xyzabc=(100,100,100,0,0,0))
 
 #take artribary ex,ey,ez,ea,eb,ec
 position_error_magnitude = 15#10 mm
@@ -32,7 +32,7 @@ angle_error = tuple([rd.sample()*angle_error_magnitude for x in range(0,3)])
 error_vector = position_error+angle_error # tuple join
 print 'Error vector:{0}'.format(error_vector)
 
-T_c_r_error = def2.HomogenousTransformation(xyzabc=error_vector)
+T_c_r_error = numeric_def.HomogenousTransformation(xyzabc=error_vector)
 T_c_r = T_c_r_error * T_c_r_nominal
 
 #generate 4-points able to construct orthogonal vector, respect to frame-r
@@ -61,7 +61,7 @@ vx = vp_set_c_xy[0,0:3]
 vy = vp_set_c_xy[1,0:3]
 vz = numpy.matrix(numpy.cross(vx,vy))
 vx_vy_vz = numpy.matrix(numpy.vstack((vx,vy,vz)))
-assert def2.is_Orthogonal(vx_vy_vz)
+assert numeric_def.is_Orthogonal(vx_vy_vz)
 
 vp_set_c_answer = numpy.matlib.identity(4)
 vp_set_c_answer[0:3,0:3] = vx_vy_vz #inject R
