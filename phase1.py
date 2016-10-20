@@ -28,6 +28,7 @@ angle_error_magnitude = numpy.deg2rad(5)# rad
 angle_error = tuple([rd.sample()*angle_error_magnitude for x in range(0,3)])
 error_vector = position_error+angle_error # tuple join
 print 'Error vector:{0}'.format(error_vector)
+
 T_c_r_error = def2.HomogenousTransformation(xyzabc=error_vector)
 T_c_r = T_c_r_error * T_c_r_nominal
 
@@ -60,22 +61,19 @@ assert def2.is_Orthogonal(vx_vy_vz)
 vp_set_c_answer = numpy.matlib.identity(4)
 vp_set_c_answer[0:3,0:3] = vx_vy_vz
 #Fix me : how to get z value
-vp_set_c[:,3]=p_set_c[:,0]
-
-
-print 'vp_set_c_1{0}'.format(vp_set(p_set_c))
-print 'vp_set_c_2{0}'.format(vp_set_c)
-#import pdb; pdb.set_trace()  # XXX BREAKPOINT
-
+vp_set_c_answer[:,3]=p_set_c[:,0]
+assert numpy.allclose(vp_set_c,vp_set_c_answer)
+#approach 1: direct inverse
+T_c_r_answer = (vp_set_c_answer*vp_set_r.I).I
+assert numpy.allclose(T_c_r_answer,T_c_r)
+#approach 2 : solve elements
 T_r_c = numpy.matlib.identity(4)
 T_r_c[0:3,0:3] = vp_set_c[0:3,0:3] * vp_set_r[0:3,0:3].I
-T_r_c[0:3,3] = vp_set_c[0:3,3] - T_r_c[0:3,0:3].I * vp_set_r[0:3,3]
-T_c_r_answer = T_r_c.I
+T_r_c[0:3,3] = vp_set_c[0:3,3] - T_r_c[0:3,0:3] * vp_set_r[0:3,3]
+T_c_r_answer2 = T_r_c.I
+assert numpy.allclose(T_c_r_answer2,T_c_r_answer) , T_c_r_answer2-T_c_r_answer
 
-print 'T_c_r_answer{0}'.format(T_c_r_answer)
-print 'T_c_r{0}'.format(T_c_r)
-#import pdb; pdb.set_trace()  # XXX BREAKPOINT
-
-print 'T_c_r_error_answer.I{0}'.format(vp_set_c * (T_c_r_nominal.I*vp_set_r).I)
-print 'T_c_r_error.I{0}'.format(T_c_r_error.I)
+#examine error calculation
+T_c_r_error_answer = T_c_r_answer * T_c_r_nominal.I 
+assert numpy.allclose(T_c_r_error_answer,T_c_r_error) , T_c_r_error_answer-T_c_r_error
 
