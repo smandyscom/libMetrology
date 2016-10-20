@@ -38,6 +38,7 @@ p_set_r = numpy.hstack(tuple([T_s0_r(0)*T_s_s0(p+(0,0,0))*p_s for p in [(0,0,0),
 vp_set_r = vp_set(p_set_r) 
 # observed by frame-C
 p_set_c = T_c_r.I * p_set_r
+p_set_c_nominal = T_c_r_nominal.I * p_set_r
 # [p1-p0 , p2-p0 , p3-p0 , p0 ]
 vp_set_c = vp_set(p_set_c)
 
@@ -45,7 +46,8 @@ assert numpy.allclose(T_c_r.I*vp_set_r,vp_set_c) , 'vp_set_c equals T_c_r.I* vp_
 assert numpy.allclose(vp_set_c*vp_set_r.I,T_c_r.I) , 'T_c_r.I equals vp_set_c * vp_set_r.I'
 
 #take x,y part only , since it is CCD
-p_set_c_xy = p_set_c[0:2,:]
+#generate simu CCD data
+p_set_c_xy = p_set_c[0:2,:] # the CCD observed
 vp_set_c_xy = vp_set(p_set_c_xy)
 
 #Object : given vp_set_c_xy , restore T_c_r
@@ -59,18 +61,24 @@ vx_vy_vz = numpy.matrix(numpy.vstack((vx,vy,vz)))
 assert def2.is_Orthogonal(vx_vy_vz)
 
 vp_set_c_answer = numpy.matlib.identity(4)
-vp_set_c_answer[0:3,0:3] = vx_vy_vz
-#Fix me : how to get z value
-vp_set_c_answer[:,3]=p_set_c[:,0]
+vp_set_c_answer[0:3,0:3] = vx_vy_vz #inject R
+#Fix me : how to determine z value
+#vp_set_c_answer[:,3]=p_set_c[:,0]
+vp_set_c_answer[:,3]=numpy.matrix([p_set_c_xy[0,0],p_set_c_xy[1,0],p_set_c[2,0],1]).T
+
 assert numpy.allclose(vp_set_c,vp_set_c_answer)
+
 #approach 1: direct inverse
 T_c_r_answer = (vp_set_c_answer*vp_set_r.I).I
-assert numpy.allclose(T_c_r_answer,T_c_r)
+assert numpy.allclose(T_c_r_answer,T_c_r) , T_c_r_answer - T_c_r
 #approach 2 : solve elements
+vp_set_c_answer2 = vp_set_c_answer
+vp_set_c_answer2[2,3] = p_set_c_nominal[2,0] #use the nominal 
 T_r_c = numpy.matlib.identity(4)
 T_r_c[0:3,0:3] = vp_set_c[0:3,0:3] * vp_set_r[0:3,0:3].I
-T_r_c[0:3,3] = vp_set_c[0:3,3] - T_r_c[0:3,0:3] * vp_set_r[0:3,3]
+T_r_c[0:3,3] = vp_set_c_answer2[0:3,3] - T_r_c[0:3,0:3] * vp_set_r[0:3,3]
 T_c_r_answer2 = T_r_c.I
+#Fix me : why x,y have obvious difference?
 assert numpy.allclose(T_c_r_answer2,T_c_r_answer) , T_c_r_answer2-T_c_r_answer
 
 #examine error calculation
