@@ -36,3 +36,15 @@ p_r1_r2 = Matrix([[r1x,r2x],[r1y,r2y],[r1z,r2z],[1,1]])
 
 #
 l_r_relation = Eq(H*p_l1_l2,p_r1_r2)
+
+#the coefficient matrix for above relation
+cof = Matrix([[1,0,0,0,zl1,0],\
+	      [0,1,0,-zl1,0,0],\
+	      [0,0,1,0,0,zl1],\
+	      [1,0,0,0,zl2,0],\
+	      [0,1,0,-zl2,0,0],\
+	      [0,0,1,0,0,zl2]])
+#the matrix form for system
+cofb = cof.row_join(Matrix([r1x,r1y,r1z,r2x,r2y,r2z]))
+
+linsolve(system,tx,ty,tz,a,b,1)
