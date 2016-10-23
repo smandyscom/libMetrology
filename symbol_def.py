@@ -2,8 +2,11 @@
 from sympy import *
 import unittest
 
-global aa
-aa = 5
+def __replace_str_as_simbol(arg):
+    if type(arg) == str:
+        return symbols(arg)
+    else:
+        return arg
 
 def Transformation_Matrix(*args):
     R,P = args
@@ -14,9 +17,9 @@ def Transformation_Matrix(*args):
 
 
 def Translation_Vector(*args):
-    x,y,z = symbols(args)
+    args = map(__replace_str_as_simbol,args)
+    x,y,z = args
     return Matrix([x,y,z])
-
 
 def Rz_Matrix(theta):
     return Matrix([[cos(theta),-sin(theta),0],
@@ -38,16 +41,21 @@ def Rx_Matrix(theta):
 #3-axis rotation pitch-row-yaw error is
 #simplified by small angle approch
 def Error_Matrix(*args):
-    epsilon_x,epsilon_y,epsilon_z = symbols(args)
+    epsilon_x,epsilon_y,epsilon_z = args
     expr = Rz_Matrix(epsilon_z)*Ry_Matrix(epsilon_y)*Rx_Matrix(epsilon_x)
+    # evaluation first if any numeric existed
+    expr = expr.evalf()
     # small angle appoximation
     for var in args:
         expr = expr.subs(sin(var),var)
         expr = expr.subs(cos(var),1)
-    # generate cross couplings
-    expr = expr.subs(epsilon_x*epsilon_y,0)
-    expr = expr.subs(epsilon_y*epsilon_z,0)
-    expr = expr.subs(epsilon_z*epsilon_x,0)
+    # simplify cross couplings
+    if type(epsilon_x) == str and type(epsilon_y) == str :
+        expr = expr.subs(epsilon_x+'*'+epsilon_y, 0)
+    if type(epsilon_y) == str and type(epsilon_z) == str :
+        expr = expr.subs(epsilon_y+'*'+epsilon_z, 0)
+    if type(epsilon_z) == str and type(epsilon_x) == str :
+        expr = expr.subs(epsilon_z+'*'+epsilon_x, 0)
     return expr
 
 if __name__ == '__main__':
@@ -56,6 +64,7 @@ if __name__ == '__main__':
 class TestSymbolFunction(unittest.TestCase):
     def setUp(self):
         init_printing()
+
     def test_ad_hoc(self):
         print Rz_Matrix('c')*Ry_Matrix('b')*Rx_Matrix('a')
         H = Ry_Matrix('b')*Rx_Matrix('a')
@@ -70,14 +79,20 @@ class TestSymbolFunction(unittest.TestCase):
         for ch in ['a','b']:
             H = H.subs(ch,3.14/180)
         print H
-        print type(H)
         print H.evalf()
-        print type(H.evalf())
 
-    def test_Error_Matrix(self):
+    def test_Error_Matrix_1(self):
         print Error_Matrix('a','b','c')
-    def test_Translation_Vector(self):
+
+    def test_Error_Matrix_2(self):
+        print Error_Matrix(0, 0,'c')
+
+    def test_Translation_Vector_1(self):
         print Translation_Vector('x','y','z')
+
+    def test_Translation_Vector_2(self):
+        print Translation_Vector(1,'y',0)
+
     def test_Transformation_Matrix(self):
         print Transformation_Matrix(Error_Matrix('a','b','c'),
                                     Translation_Vector('x','y','z'))
