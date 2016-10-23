@@ -22,6 +22,7 @@ p_s0_known = symbol_def.Translation_Vector('rx','ry','rz').col_join(sympy.Matrix
 
 linkage = sympy.Eq(T_Y0_S0_error *T_L_Y0_nominal *T_L_Y0_error *p_l_measure,p_s0_known)
 print linkage
+
 #ignore any second error, take all of them as zero
 
 

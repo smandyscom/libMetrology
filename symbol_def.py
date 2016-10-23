@@ -2,11 +2,13 @@
 from sympy import *
 import unittest
 
+
 def __replace_str_as_simbol(arg):
     if type(arg) == str:
         return symbols(arg)
     else:
         return arg
+
 
 def Transformation_Matrix(*args):
     R,P = args
@@ -20,6 +22,7 @@ def Translation_Vector(*args):
     args = map(__replace_str_as_simbol,args)
     x,y,z = args
     return Matrix([x,y,z])
+
 
 def Rz_Matrix(theta):
     return Matrix([[cos(theta),-sin(theta),0],
