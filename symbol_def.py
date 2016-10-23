@@ -1,17 +1,8 @@
 from sympy import *
+import unittest
 
-def HomogenousTransformationSymbol(subscript):
-    R = MatrixSymbol('R' + subscript,3,3)
-    P = MatrixSymbol('P' + subscript,3,1)
-    zero = ZeroMatrix(1,3)
-    one = Identity(1)
-    return Matrix([[R,P],[zero,one]])
 
-def PositionSymbol(subscript):
-    pass
-
-def VectorSymbol(subscript):
-    pass
+# def Translation_Matrix
 
 def Rz_Matrix(theta):
     return Matrix([[cos(theta),-sin(theta),0],
@@ -29,9 +20,22 @@ def Rx_Matrix(theta):
     [0,cos(theta),-sin(theta)],
     [0,sin(theta),cos(theta)]])
 
+#3-axis rotation pitch-row-yaw error is
+#simplified by small angle approch
+def Error_Matrix(*args):
+    epsilon_x,epsilon_y,epsilon_z = symbols(args)
+    expr = Rz_Matrix(epsilon_z)*Ry_Matrix(epsilon_y)*Rx_Matrix(epsilon_x)
+    # small angle appoximation
+    for var in args:
+        expr = expr.subs(sin(var),var)
+        expr = expr.subs(cos(var),1)
+    # generate cross couplings
+    expr = expr.subs(epsilon_x*epsilon_y,0)
+    expr = expr.subs(epsilon_y*epsilon_z,0)
+    expr = expr.subs(epsilon_z*epsilon_x,0)
+    return expr
 
 if __name__ == '__main__':
-    print Matrix(HomogenousTransformationSymbol('cs') * HomogenousTransformationSymbol('sr'))
     print Rz_Matrix('c')*Ry_Matrix('b')*Rx_Matrix('a')
     H = Ry_Matrix('b')*Rx_Matrix('a')
     print H
@@ -48,3 +52,9 @@ if __name__ == '__main__':
     print type(H)
     print H.evalf()
     print type(H.evalf())
+
+class TestSymbolFunction(unittest.TestCase):
+    def setUp(self):
+        init_printing()
+    def test_Error_Matrix(self):
+        print Error_Matrix('a','b','c')
