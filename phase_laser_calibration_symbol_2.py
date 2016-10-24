@@ -1,5 +1,7 @@
-import symbol_def
 import sympy
+from sympy import polys
+
+import symbol_def
 
 sympy.init_printing()
 
@@ -20,9 +22,42 @@ T_Y0_S0_error = symbol_def.Transformation_Matrix(symbol_def.Error_Matrix('eyx', 
 p_l_measure = symbol_def.Translation_Vector(0,0,'zl').col_join(sympy.Matrix([1]))
 p_s0_known = symbol_def.Translation_Vector('rx','ry','rz').col_join(sympy.Matrix([1]))
 
+p_s0_measure = T_Y0_S0_error *T_L_Y0_nominal *T_L_Y0_error *p_l_measure
+
 linkage = sympy.Eq(T_Y0_S0_error *T_L_Y0_nominal *T_L_Y0_error *p_l_measure,p_s0_known)
 print linkage
 
 #ignore any second error, take all of them as zero
+elimiation_table = [x*y for y in [elx,ely,slx,sly,slz] for x in (eyx,eyy,eyz,syx,syy,syz)]
+#approximation : set second error as zero
+for var in elimiation_table:
+    linkage = linkage.subs(var,0)
+    #p_s0_measure = p_s0_measure.subs(var,0)
+    
+#print linkage
+
+#collect coefficient for unknowns
+coeffX = polys.polytools.poly(p_s0_measure[0],(eyx,eyy,eyz,syx,syy,syz,elx,ely,slx,sly,slz)).coeffs()
+coeffY = polys.polytools.poly(p_s0_measure[1],(eyx,eyy,eyz,syx,syy,syz,elx,ely,slx,sly,slz)).coeffs()
+coeffZ = polys.polytools.poly(p_s0_measure[2],(eyx,eyy,eyz,syx,syy,syz,elx,ely,slx,sly,slz)).coeffs()
+print coeffX
+print coeffY
+print coeffZ
+
+print p_s0_measure
+for var in elimiation_table:
+    p_s0_measure = p_s0_measure.subs(var,0)
+print p_s0_measure
+
+#11 unkowns , at least need 4 point = 12 equations to solve
+#coeff_matrix = sympy.Matrix([coeffX,coeffY,coeffZ])
+#print coeff_matrix
 
 
+#estimate the condition
+#p_l_measures = sympy.Matrix([[0,0,'zl'+str(x),1] for x in range(0,4)]).T
+#p_s0_knowns = sympy.Matrix([['rx'+str(x),'ry'+str(x),'rz'+str(x),1] for x in range(0,4)]).T
+#p_s0_measures= T_Y0_S0_error *T_L_Y0_nominal *T_L_Y0_error *p_l_measures 
+#print p_s0_measures
+#coeff_matrix = [polys.polytools.poly(p_s0_measures[i,j],(eyx,eyy,eyz,syx,syy,syz,elx,ely,slx,sly,slz)).coeffs() for i in range(0,4) for j in range(0,4)]
+#print sympy.Matrix(coeff_matrix)
