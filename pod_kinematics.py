@@ -1,17 +1,17 @@
 import numpy
 import unittest
 import numeric_def
+import random
 
-def pod_fixed_inverse(htm):
+def pod_relative_inverse(htm):
     #a->b->c->x->y->z
     x, y, z = htm[0, 3], htm[1, 3], htm[2, 3]
-    _sinb, _cosb_cosc, _cosa_cosb = -htm[2, 0], htm[0, 0], htm[2, 2]
     #solve a,b,c
-    b = numpy.arcsin(_sinb)
-    c = numpy.arccos(_cosb_cosc/numpy.cos(b))
-    a = numpy.arccos(_cosa_cosb/numpy.cos(b))
+    a = numpy.arctan2(htm[2, 1], htm[2, 2])
+    b = numpy.arcsin(-htm[2, 0])
+    c = numpy.arctan2(htm[1, 0], htm[0, 0])
     #
-    return a, b, c, x, y, z
+    return x, y, z, a, b, c
 
 
 class TestKinematicFunction(unittest.TestCase):
@@ -20,6 +20,20 @@ class TestKinematicFunction(unittest.TestCase):
         # numpy.init_printing()
 
     def test_1(self):
-        __input = numeric_def.HomogenousTransformation(xyzabc=(1, 2, 3, 0.5, 0.5, 0.5))
-        print __input
-        print pod_fixed_inverse(__input)
+        __tuple_pos = tuple([random.random() for x in range(0,3)])
+        __tuple_angle = tuple([random.uniform(0, 3.14) for x in range(0,3)])
+
+        __input = numeric_def.HomogenousTransformation(xyzabc=__tuple_pos+__tuple_angle)
+
+        __tuple_answer = pod_relative_inverse(__input)
+
+        __forward = numeric_def.HomogenousTransformation(xyzabc=__tuple_answer)
+
+        self.assertTrue(numpy.allclose(__forward, __input),
+                        '__input:{0},__forward:{1}'.format(__input,__forward))
+
+        self.assertTrue(numpy.allclose(numpy.matrix(__tuple_pos + __tuple_angle),numpy.matrix(__tuple_answer)),
+                        '\nanswer:{0}\nrefer:{1}\n__input:\n{2}\n__forward:\n{3}'.format(__tuple_answer,
+                                                                                __tuple_pos + __tuple_angle,
+                                                                                __input,
+                                                                                __forward))
