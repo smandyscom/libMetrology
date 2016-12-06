@@ -37,3 +37,7 @@ class TestKinematicFunction(unittest.TestCase):
                                                                                 __tuple_pos + __tuple_angle,
                                                                                 __input,
                                                                                 __forward))
+        print '\nanswer:{0}\nrefer:{1}\n__input:\n{2}\n__forward:\n{3}'.format(__tuple_answer,
+                                                                                __tuple_pos + __tuple_angle,
+                                                                                __input,
+                                                                                __forward)
