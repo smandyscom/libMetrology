@@ -43,7 +43,7 @@ def Rx_Matrix(theta):
 
 #3-axis rotation pitch-row-yaw error is
 #simplified by small angle approch
-def Error_Matrix(*args):
+def Error_Rotation_Matrix(*args):
     epsilon_x,epsilon_y,epsilon_z = args
     expr = Rz_Matrix(epsilon_z)*Ry_Matrix(epsilon_y)*Rx_Matrix(epsilon_x)
     # evaluation first if any numeric existed
@@ -61,6 +61,12 @@ def Error_Matrix(*args):
         expr = expr.subs(epsilon_z+'*'+epsilon_x, 0)
     return expr
 
+def Error_Matrix(error_vector):
+    ex, ey, ez, sx, sy, sz = error_vector
+    return Transformation_Matrix(Error_Rotation_Matrix(ex, ey, ez),
+                                 Translation_Vector(sx, sy, sz))
+
+
 if __name__ == '__main__':
     init_session()
 
@@ -68,27 +74,27 @@ class TestSymbolFunction(unittest.TestCase):
     def setUp(self):
         init_printing()
 
-    def test_ad_hoc(self):
-        print Rz_Matrix('c')*Ry_Matrix('b')*Rx_Matrix('a')
-        H = Ry_Matrix('b')*Rx_Matrix('a')
-        print H
-        print simplify(H)
-        print trigsimp(simplify(H))
+    # def test_ad_hoc(self):
+        # print Rz_Matrix('c')*Ry_Matrix('b')*Rx_Matrix('a')
+        # H = Ry_Matrix('b')*Rx_Matrix('a')
+        # print H
+        # print simplify(H)
+        # print trigsimp(simplify(H))
         # small angle approch
-        for ch in ['a','b']:
-            H = H.subs(sin(ch),ch)
-            H = H.subs(cos(ch),1)
-        print simplify(H)
-        for ch in ['a','b']:
-            H = H.subs(ch,3.14/180)
-        print H
-        print H.evalf()
+        # for ch in ['a','b']:
+            # H = H.subs(sin(ch),ch)
+            # H = H.subs(cos(ch),1)
+        # print simplify(H)
+        # for ch in ['a','b']:
+            # H = H.subs(ch,3.14/180)
+        # print H
+        # print H.evalf()
 
     def test_Error_Matrix_1(self):
-        print Error_Matrix('a','b','c')
+        print Error_Rotation_Matrix('a','b','c')
 
     def test_Error_Matrix_2(self):
-        print Error_Matrix(0, 0,'c')
+        print Error_Rotation_Matrix(0, 0,'c')
 
     def test_Translation_Vector_1(self):
         print Translation_Vector('x','y','z')
@@ -97,5 +103,8 @@ class TestSymbolFunction(unittest.TestCase):
         print Translation_Vector(1,'y',0)
 
     def test_Transformation_Matrix(self):
-        print Transformation_Matrix(Error_Matrix('a','b','c'),
+        print Transformation_Matrix(Error_Rotation_Matrix('a','b','c'),
                                     Translation_Vector('x','y','z'))
+
+    def test_Error_Matrix_3(self):
+        print Error_Matrix(('ex', 'ey', 'ez', 'sx', 'sy', 'sz'))
