@@ -11,54 +11,63 @@ def __replace_str_as_simbol(arg):
 
 
 def Transformation_Matrix(*args):
-    R,P = args
+    R, P = args
     htm = eye(4)
-    htm[0:3,0:3] = R
-    htm[0:3,3] = P
+    htm[0:3, 0:3] = R
+    htm[0:3, 3] = P
     return htm
 
 
 def Translation_Vector(*args):
-    args = map(__replace_str_as_simbol,args)
-    x,y,z = args
-    return Matrix([x,y,z])
+    args = map(__replace_str_as_simbol, args)
+    x, y, z = args
+    return Matrix([x, y, z])
 
 
 def Rz_Matrix(theta):
-    return Matrix([[cos(theta),-sin(theta),0],
-    [sin(theta),cos(theta),0],
-    [0,0,1]])
+    return Matrix([[cos(theta), -sin(theta), 0],
+                   [sin(theta), cos(theta), 0],
+                   [0, 0, 1]])
 
 
 def Ry_Matrix(theta):
-    return Matrix([[cos(theta),0,sin(theta)],
-    [0,1,0],
-    [-sin(theta),0,cos(theta)]])
+    return Matrix([[cos(theta), 0, sin(theta)],
+                   [0, 1, 0],
+                   [-sin(theta), 0, cos(theta)]])
 
 
 def Rx_Matrix(theta):
-    return Matrix([[1,0,0],
-    [0,cos(theta),-sin(theta)],
-    [0,sin(theta),cos(theta)]])
+    return Matrix([[1, 0, 0],
+                   [0, cos(theta), -sin(theta)],
+                   [0, sin(theta), cos(theta)]])
 
 #3-axis rotation pitch-row-yaw error is
 #simplified by small angle approch
 def Error_Rotation_Matrix(*args):
-    epsilon_x,epsilon_y,epsilon_z = args
+    epsilon_x, epsilon_y, epsilon_z = args
     expr = Rz_Matrix(epsilon_z)*Ry_Matrix(epsilon_y)*Rx_Matrix(epsilon_x)
     # evaluation first if any numeric existed
     expr = expr.evalf()
     # small angle appoximation
     for var in args:
-        expr = expr.subs(sin(var),var)
-        expr = expr.subs(cos(var),1)
+        expr = expr.subs(sin(var), var)
+        expr = expr.subs(cos(var), 1)
     # simplify cross couplings
-    if type(epsilon_x) == str and type(epsilon_y) == str :
-        expr = expr.subs(epsilon_x+'*'+epsilon_y, 0)
-    if type(epsilon_y) == str and type(epsilon_z) == str :
-        expr = expr.subs(epsilon_y+'*'+epsilon_z, 0)
-    if type(epsilon_z) == str and type(epsilon_x) == str :
-        expr = expr.subs(epsilon_z+'*'+epsilon_x, 0)
+    # if type(epsilon_x) == str and type(epsilon_y) == str :
+        # expr = expr.subs(epsilon_x+'*'+epsilon_y, 0)
+    # else:
+    expr = expr.subs(epsilon_x*epsilon_y, 0)
+
+    # if type(epsilon_y) == str and type(epsilon_z) == str :
+        # expr = expr.subs(epsilon_y+'*'+epsilon_z, 0)
+    # else:
+    expr = expr.subs(epsilon_y*epsilon_z, 0)
+
+    # if type(epsilon_z) == str and type(epsilon_x) == str :
+        # expr = expr.subs(epsilon_z+'*'+epsilon_x, 0)
+    # else:
+    expr = expr.subs(epsilon_z*epsilon_x, 0)
+
     return expr
 
 def Error_Matrix(error_vector):
