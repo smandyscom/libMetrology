@@ -35,6 +35,41 @@ def l_error_analysis_2():
 
     return P_l_error, error_gain_p_l
 
+def l_ax_ay_profile_analysis():
+    __coeff = iter(sympy.symbols(['C{0}'.format(x) for x in range(0, 20)]))
+    Ax, Ay, Mz = sympy.symbols(['Ax', 'Ay', 'Mz'])
+    __x = (Ax, Ay, Mz)
+    P_r = P_r_by_l_real(Ax, Ay, Mz)
+    # take some organizing
+    new_entity = []
+    for entity in P_r[:, :]:
+        expr = entity.expand().collect(__x)
+        # print expr
+        record = []
+        for factor in __x:
+            expr = expr.subs(expr.coeff(factor), __coeff.next())
+            record.append(factor*expr.coeff(factor))
+        #replace constant as simplified symbol
+        expr = expr.subs(expr - sum(record),
+                         __coeff.next())
+        new_entity.append(expr)
+
+    P_r = sympy.Matrix(new_entity)
+    P_r = P_r[0:3, :]
+    # since going to scan a circle profile, a conoical form established
+    circle_expr = sum([x**2 for x in P_r[:, :]])
+    #generate ellipse form
+    ellipse_coff_2 = (sympy.Matrix([circle_expr.expand()]).jacobian(__x)).jacobian(__x)
+    ellipse_expr = sympy.Matrix(__x).T * (ellipse_coff_2/2).T * sympy.Matrix(__x)
+    ellipse_coff_1 = sympy.Matrix([circle_expr.expand() - ellipse_expr[0, 0].expand()]).jacobian(__x)
+    ellipse_expr[0, 0] +=  (ellipse_coff_1 * sympy.Matrix(__x))[0, 0]
+    ellipse_coff_0 = circle_expr.expand() - ellipse_expr[0, 0]
+    ellipse_expr[0, 0] += ellipse_coff_0
+    print circle_expr.expand()
+    print ellipse_expr[0, 0].expand()
+    print ellipse_expr[0, 0].expand() == circle_expr.expand()
+
+
 class TestAnalysisFunction(unittest.TestCase):
     def setUp(self):
         sympy.init_printing()
