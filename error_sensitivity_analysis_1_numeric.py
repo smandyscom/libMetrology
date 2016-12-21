@@ -40,21 +40,23 @@ def T_s_s0(translation):
 
 def coefficien_matrix(vector_S):
     Sx, Sy, Sz = vector_S
-    return numpy.matrix(([0, -Cx-Px+S0x-Sx, Cz+Pz-S0z+Sz, 1, 0],
-                         [Cx+Px-S0x+Sx, 0, Cy-Py-S0y-Sy, 0, 1]))
+    return numpy.matrix(([0, Cx+Px-S0x+Sx, -Cz-Pz+S0z-Sz, -1, 0, 0],
+                         [-Cx-Px+S0x-Sx, 0, -Cy+Py+S0y+Sy, 0, -1, 0],
+                         [Cz+Pz-S0z+Sz, Cy-Py-S0y-Sy, 0, 0, 0, -1],
+                         [0, 0, 0, 0, 0, 0]))
 
 #the end ball used to do calibration
 P_s = numeric_def.PositionVector(Px, Py, Pz)
 
 VECTOR_S_SET = [(0, 0, 0),
-                (10, 10, 1),
-                (-10, 10, 1),
-                (10, -10, 1),
-                (-10, -10, 1),
-                (10, 10, -1),
-                (-10, 10, -1),
-                (10, -10, -1),
-                (-10, -10, -1)]
+                (10, 10, 0),
+                (-10, 10, 0),
+                (10, -10, 0),
+                (-10, -10, 0),
+                (10, 10, 0),
+                (-10, 10, 0),
+                (10, -10, 0),
+                (-10, -10, 0)]
 
 
 P_c_offseted = []
@@ -63,17 +65,19 @@ Coefficients = []
 for index in range(0, len(VECTOR_S_SET)):
     # print VECTOR_S_SET[index]
     Sx, Sy, Sz = VECTOR_S_SET[index]
-    P_c = T_c_creal * T_c_r.I * T_s0_r * T_s_s0((Sx, Sy, Sz)) * P_s
-    # offset
-    P_c = P_c - numpy.matrix((Cy-S0y-Sy-Py,
-                              -Cz+S0z-Sz-Pz,
-                              0,
-                              1)).T
+    P_c_nominal = T_c_r.I * T_s0_r * T_s_s0((Sx, Sy, Sz)) *P_s
+    P_c_real = T_c_creal * P_c_nominal
+    # P_c_real[2, 0] = 0 #since z cannot be measured
+    # error part
+    P_c_error = P_c_nominal - P_c_real
     #adding some noise
-    P_c = P_c[0:2 , :] + numpy.matrix((random.uniform(-NOISE_SCALE,NOISE_SCALE),
-                                       random.uniform(-NOISE_SCALE,NOISE_SCALE))).T
+    P_c_error = P_c_error + numpy.matrix((random.uniform(-NOISE_SCALE,NOISE_SCALE),
+                                          random.uniform(-NOISE_SCALE,NOISE_SCALE),
+                                          random.uniform(-NOISE_SCALE,NOISE_SCALE),
+                                          0)).T
+
     # print P_c
-    P_c_offseted.append(P_c)
+    P_c_offseted.append(P_c_error)
     # print P_c_offseted
     Coefficients.append(coefficien_matrix((Sx, Sy, Sz)))
 
@@ -88,3 +92,4 @@ error_vector = numpy.linalg.pinv(Coefficients) * P_c_offseted
 # print numpy.linalg.pinv(Coefficients)
 print error_vector
 print error_vector_answer
+print error_vector - numpy.matrix(error_vector_answer).T

@@ -60,14 +60,15 @@ def l_ax_ay_profile_analysis():
     circle_expr = sum([x**2 for x in P_r[:, :]])
     #generate ellipse form
     ellipse_coff_2 = (sympy.Matrix([circle_expr.expand()]).jacobian(__x)).jacobian(__x)
-    ellipse_expr = sympy.Matrix(__x).T * (ellipse_coff_2/2).T * sympy.Matrix(__x)
-    ellipse_coff_1 = sympy.Matrix([circle_expr.expand() - ellipse_expr[0, 0].expand()]).jacobian(__x)
-    ellipse_expr[0, 0] +=  (ellipse_coff_1 * sympy.Matrix(__x))[0, 0]
-    ellipse_coff_0 = circle_expr.expand() - ellipse_expr[0, 0]
-    ellipse_expr[0, 0] += ellipse_coff_0
-    print circle_expr.expand()
-    print ellipse_expr[0, 0].expand()
-    print ellipse_expr[0, 0].expand() == circle_expr.expand()
+    ellipse_expr_2 = (sympy.Matrix(__x).T * (ellipse_coff_2/2).T * sympy.Matrix(__x))[0, 0]
+    ellipse_coff_1 = sympy.Matrix([circle_expr.expand() - ellipse_expr_2.expand()]).jacobian(__x)
+    ellipse_expr_1 =  (ellipse_coff_1 * sympy.Matrix(__x))[0, 0]
+    ellipse_expr_0 = circle_expr.expand() - ellipse_expr_2.expand() - ellipse_expr_1.expand()
+    # ellipse_expr[0, 0] += ellipse_coff_0
+    # print circle_expr.expand()
+    # print ellipse_expr[0, 0].expand()
+    # print ellipse_expr[0, 0].expand() == circle_expr.expand()
+    return ellipse_coff_2, ellipse_coff_1,  ellipse_expr_0
 
 
 class TestAnalysisFunction(unittest.TestCase):

@@ -11,6 +11,22 @@ def is_Orthogonal(m):
 def force_vector_unity(vec):
     return (1/linalg.norm(vec)) * vec
 
+class ErrorTransformation(numpy.matrix):
+    def __new__(self, ERROR_VECTOR):
+        #unpack
+        ex, ey, ez, sx, sy, sz = ERROR_VECTOR
+        self = matlib.identity(4)
+        self[0:3, 3] = numpy.matrix([sx, sy, sz]).T
+        self[2, 1] = ex
+        self[1, 2] = -ex
+        self[0, 2] = ey
+        self[2, 0] = -ey
+        self[1, 0] = ez
+        self[0, 1] = -ez
+        return self
+
+    def __init__(self):
+        pass
 
 class HomogenousTransformation(numpy.matrix):
     def __new__(self,**kwargs):
@@ -53,6 +69,8 @@ class PositionVector(numpy.matrix):
         self = numpy.matrix([px, py, pz, scale], dtype=float)
         return self.T
 
+
+
 if __name__ == '__main__':
     print is_Orthogonal(numpy.matrix([[1,0],[0,1]]))
     print force_vector_unity(numpy.matrix([1,1,1]))
@@ -77,5 +95,6 @@ if __name__ == '__main__':
     print HomogenousTransformation(xyzabc=(1,2,3,0,0,0)) * PositionVector(1,1,1,1)
     seed=(1,1,1,3.14,3.14,3.14)
     print HomogenousTransformation(xyzabc=seed) * HomogenousTransformation(xyzabc=seed).I
-    print HomogenousTransformation(xyzabc=seed).R
+    # print HomogenousTransformation(xyzabc=seed).R
+    print ("E:", ErrorTransformation((0.1, 0.2, 0.3, 0.4, 0.5, 0.6)))
 
