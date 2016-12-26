@@ -29,21 +29,21 @@ class ErrorTransformation(numpy.matrix):
         pass
 
 class HomogenousTransformation(numpy.matrix):
-    def __new__(self,**kwargs):
+    def __new__(self, **kwargs):
         self = matlib.identity(4)
         if 'RP' in kwargs:
-            R,P = kwargs['RP']
-            for i in range(0,3):
-                R[:,i]=force_vector_unity(R[:,i])
+            R, P = kwargs['RP']
+            for i in range(0, 3):
+                R[:, i] = force_vector_unity(R[:, i])
             if not is_Orthogonal(R):
                 raise ValueError('R is not orthogonal')
-            self[0:3,0:3]=R
-            self[0:3,3]=P
+            self[0:3, 0:3] = R
+            self[0:3, 3] = P
         elif 'xyzabc' in kwargs:
-            x,y,z,a,b,c = kwargs['xyzabc']
+            x, y, z, a, b, c = kwargs['xyzabc']
             R = numpy.matrix(gu.Rz_matrix(c))*numpy.matrix(gu.Ry_matrix(b))*numpy.matrix(gu.Rx_matrix(a))
-            P = numpy.matrix([x,y,z]).T
-            self = HomogenousTransformation(RP=(R,P))
+            P = numpy.matrix([x, y, z]).T
+            self = HomogenousTransformation(RP=(R, P))
         else:
             pass
         #
@@ -54,13 +54,15 @@ class HomogenousTransformation(numpy.matrix):
     def __init__(self):
         pass
 
+    #FIXME: R,P is able to be edited after initialized
+
     @property
     def R(self):
-        return self[0:3,0:3]
+        return self[0:3, 0:3]
 
     @property
     def P(self):
-        return self[0:3,3]
+        return self[0:3, 3]
 
 
 
@@ -94,7 +96,9 @@ if __name__ == '__main__':
     # print HomogenousTransformation(RP=(R,P))
     print HomogenousTransformation(xyzabc=(1,2,3,0,0,0)) * PositionVector(1,1,1,1)
     seed=(1,1,1,3.14,3.14,3.14)
+    __htm = HomogenousTransformation(xyzabc=seed) * HomogenousTransformation(xyzabc=seed).I
     print HomogenousTransformation(xyzabc=seed) * HomogenousTransformation(xyzabc=seed).I
     # print HomogenousTransformation(xyzabc=seed).R
     print ("E:", ErrorTransformation((0.1, 0.2, 0.3, 0.4, 0.5, 0.6)))
+    print __htm.P
 
