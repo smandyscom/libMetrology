@@ -63,22 +63,21 @@ def T_s_s0(axis_tuple):
                                             symbol_def.Ry_Matrix(b) *
                                             symbol_def.Rx_Matrix(a),
                                             symbol_def.Translation_Vector(x, y, z))
-#Y0-Frame in S0-Frame
+#Y0-Frame in S0-Frame (C4 in y-start position)
 Y0X, Y0Y, Y0Z = sympy.symbols(['Y0X', 'Y0Y', 'Y0Z'])
-T_y0_s0 = symbol_def.Transformation_Matrix(sympy.eye(3),
+T_y0_s0 = symbol_def.Transformation_Matrix(sympy.Matrix(([-1, 0, 0],
+                                                          [0, 1, 0],
+                                                          [0, 0, -1])),
                                            symbol_def.Translation_Vector(Y0X, Y0Y, Y0Z))
 
 #Y0REAL-Frame in Y-Frame
 ERROR_VECTOR_Y0 = sympy.symbols(['exy0', 'eyy0', 'ezy0', 'sxy0', 'syy0', 'szy0'])
-T_y0_y0real = symbol_def.Error_Matrix(ERROR_VECTOR_Y0)
+T_y0real_y0 = symbol_def.Error_Matrix(ERROR_VECTOR_Y0)
 
 #C4-Frame in Y0REAL-Frame
-C4x, C4y, C4z = sympy.symbols(['C4x', 'C4y', 'C4z'])
 def T_c4_y0real(Ay):
-    return symbol_def.Transformation_Matrix(sympy.Matrix(([1, 0, 0],
-                                                          [0, 1, 0],
-                                                          [0, 0, 1])),
-                                            symbol_def.Translation_Vector(C4x, C4y + Ay, C4z))
+    return symbol_def.Transformation_Matrix(sympy.eye(3),
+                                            symbol_def.Translation_Vector(0, Ay, 0))
 
 
 

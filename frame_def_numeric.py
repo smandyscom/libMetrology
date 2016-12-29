@@ -2,10 +2,21 @@ import numpy
 from numpy import cos, sin
 import random
 
+
 ERROR_SCALE_DEG = 5
 ERROR_SCALE_MM = 5
 # NOISE_SCALE = 0.1 * ERROR_SCALE
 
+#defines
+EX = 0
+EY = 1
+EZ = 2
+SX = 3
+SY = 4
+SZ = 5
+TX = 0
+TY = 1
+TZ = 2
 
 class htm(numpy.matrix):
     @property
@@ -54,17 +65,17 @@ T_c1_r, T_c2_r, T_c3_r, T_y0_s0, T_l_c4 = tuple([htm(numpy.eye(4)) for x in rang
 T_c1_r.R = numpy.matrix(([0, 0, -1],
                          [-1, 0, 0],
                          [0, 1, 0]))
-T_c1_r.P = numpy.matrix((95.823, 2013.615, 58.255, 1)).T
+T_c1_r.P = numpy.matrix((95.823, 213.615, 58.255, 1)).T
 
 T_c2_r.R = numpy.matrix(([1, 0, 0],
                          [0, 0, -1],
                          [0, 1, 0]))
-T_c2_r.P = numpy.matrix((95.823, 2013.615, 58.255, 1)).T
+T_c2_r.P = numpy.matrix((95.823, 213.615, 58.255, 1)).T
 
 T_c3_r.R = numpy.matrix(([1, 0, 0],
                          [0, 1, 0],
                          [0, 0, 1]))
-T_c1_r.P = numpy.matrix((95.823, 2013.615, 58.255, 1)).T
+T_c1_r.P = numpy.matrix((95.823, 213.615, 58.255, 1)).T
 
 
 def T_s0_r(Ax):
@@ -72,7 +83,7 @@ def T_s0_r(Ax):
     __htm.R = numpy.matrix(([-1, 0, 0],
                             [0, 1, 0],
                             [0, 0, -1]))
-    __htm.P = numpy.matrix((95.823 + Ax, 163.5, 120.002, 1))
+    __htm.P = numpy.matrix((95.823 + Ax, 163.5, 120.002, 1)).T
     return __htm
 
 
@@ -98,7 +109,7 @@ def T_c4_y0real(Ay):
     __htm.R = numpy.matrix(([-1, 0, 0],
                             [0, 1, 0],
                             [0, 0, -1]))
-    __htm.P = numpy.matrix((95.823, 163.5, 120.002 + Ay, 1))
+    __htm.P = numpy.matrix((95.823, 163.5, 120.002 + Ay, 1)).T
     return __htm
 
 # error matrice
