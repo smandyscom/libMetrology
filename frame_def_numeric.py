@@ -77,13 +77,22 @@ T_c3_r.R = numpy.matrix(([1, 0, 0],
                          [0, 0, 1]))
 T_c1_r.P = numpy.matrix((95.823, 213.615, 58.255, 1)).T
 
+T_y0_s0.R = numpy.matrix(([-1, 0, 0],
+                          [0, 1, 0],
+                          [0, 0, -1]))
+T_y0_s0.P = numpy.matrix((95.823, 213.615, 58.255, 1)).T
+
+T_l_c4.R = numpy.matrix(([1, 0, 0],
+                         [0, 1, 0],
+                         [0, 0, 1]))
+T_l_c4.P = numpy.matrix((95.823, 213.615, 58.255, 1)).T
 
 def T_s0_r(Ax):
     __htm = htm(numpy.eye(4))
     __htm.R = numpy.matrix(([-1, 0, 0],
                             [0, 1, 0],
                             [0, 0, -1]))
-    __htm.P = numpy.matrix((95.823 + Ax, 163.5, 120.002, 1)).T
+    __htm.P = numpy.matrix((Ax, 163.5, 120.002, 1)).T
     return __htm
 
 
@@ -106,18 +115,18 @@ def T_s_s0(a, b, c, x, y, z):
 def T_c4_y0real(Ay):
     # z align to working height
     __htm = htm(numpy.eye(4))
-    __htm.R = numpy.matrix(([-1, 0, 0],
+    __htm.R = numpy.matrix(([1, 0, 0],
                             [0, 1, 0],
-                            [0, 0, -1]))
-    __htm.P = numpy.matrix((95.823, 163.5, 120.002 + Ay, 1)).T
+                            [0, 0, 1]))
+    __htm.P = numpy.matrix((0, Ay, 0, 1)).T
     return __htm
 
 # error matrice
 
 
 def gen_error_vector():
-    return (tuple([random.uniform(-ERROR_SCALE_MM, ERROR_SCALE_MM) for x in range(0, 3)]) +
-                            tuple([random.uniform(-numpy.deg2rad(ERROR_SCALE_DEG), numpy.deg2rad(ERROR_SCALE_DEG)) for x in range(0, 3)]))
+    return (tuple([random.uniform(-numpy.deg2rad(ERROR_SCALE_DEG), numpy.deg2rad(ERROR_SCALE_DEG)) for x in range(0, 3)]) +
+            tuple([random.uniform(-ERROR_SCALE_MM, ERROR_SCALE_MM) for x in range(0, 3)]))
 
 T_c1real_c1, T_c2real_c2, T_c3real_c3, T_y0real_y0, T_lreal_l = tuple([error_matrix(numpy.eye(4)) for x in range(0, 5)])
 

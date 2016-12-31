@@ -10,9 +10,9 @@ def P_r_by_l_real_2():
     # simplified
     Txy, Tyy, Tzy = sympy.symbols('Txy,Tyy,Tzy')
     ex, ey, ez  = ERROR_VECTOR_Y0[0:3]
-    T_y0real_s0 = sympy.Matrix(([1, -ez, ey, Txy],
+    T_y0real_s0 = sympy.Matrix(([-1, ez, -ey, Txy],
                                 [ez, 1, -ex, Tyy],
-                                [-ey, ex, 1, Tzy],
+                                [ey, -ex, -1, Tzy],
                                 [0, 0, 0, 1]))
 
     Txl, Tyl, Tzl = sympy.symbols('Txl,Tyl,Tzl')
@@ -25,7 +25,7 @@ def P_r_by_l_real_2():
     P_r = T_s0_r(Ax)*T_y0real_s0*T_c4_y0real(Ay)*T_lreal_c4*sympy.Matrix(([0, 0, Mz, 1]))
     P_r_jacobian = P_r.jacobian((Ax, Ay, Mz))
     P_r_offset = P_r - P_r_jacobian * sympy.Matrix(([Ax, Ay, Mz]))
-    return sympy.simplify(P_r_jacobian), sympy.simplify(P_r_offset)
+    return sympy.simplify(P_r), sympy.simplify(P_r_jacobian), sympy.simplify(P_r_offset)
 
 
 # Laser measure error analysis(without sz)
