@@ -47,6 +47,16 @@ __Ay = con[1]
 print con
 print T_s0_r(__Ax) * T_y0real_s0 * T_c4_y0real(__Ay) * T_lreal_c4 * numpy.matrix((0, 0, con[2], 1)).T
 print circle_points[0][0]
+
+axis_values = [map(lambda x: (coeff.I * (x[:, 0:3].T - offset_value)), circle_point_set) for circle_point_set in circle_points]
+
+def P_r_by_l(Ax, Ay, Mz):
+    return T_s0_r(Ax) * T_y0real_s0 * T_c4_y0real(Ay) * T_lreal_c4 * numpy.matrix((0, 0, Mz, 1)).T
+
+verification = [map(lambda x: (P_r_by_l(x[0], x[1], x[2])), axis_value_set) for axis_value_set in axis_values ]
+
+
+
 # verification : take Ax, Ay, Mz forward kinematic to verify P_r
 #Ax,Ay fitted center Ax_bar,Ay_bar
 
