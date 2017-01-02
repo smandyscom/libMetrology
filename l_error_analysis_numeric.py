@@ -3,6 +3,7 @@ from frame_def_numeric import htm, error_matrix
 from frame_def_numeric import T_s0_r, T_c4_y0real
 import numpy
 import random
+import circle_fit
 
 #prepare cicle points
 RADIUS = 2
@@ -42,11 +43,16 @@ print coeff
 # print offset_value
 # print ((circle_points[0][0])[0:3, :] - offset_value)
 con = coeff.I * (((circle_points[0][0])[:, 0:3]).T - offset_value)
+
+def solve_Ax_Ay_Mz(P_r):
+    # P_r , 3x1 vector
+    return coeff.I * (P_r - offset_value)
+
 __Ax = con[0]
 __Ay = con[1]
-print con
-print T_s0_r(__Ax) * T_y0real_s0 * T_c4_y0real(__Ay) * T_lreal_c4 * numpy.matrix((0, 0, con[2], 1)).T
-print circle_points[0][0]
+# print con
+# print T_s0_r(__Ax) * T_y0real_s0 * T_c4_y0real(__Ay) * T_lreal_c4 * numpy.matrix((0, 0, con[2], 1)).T
+# print circle_points[0][0]
 
 axis_values = [map(lambda x: (coeff.I * (x[:, 0:3].T - offset_value)), circle_point_set) for circle_point_set in circle_points]
 
@@ -55,7 +61,14 @@ def P_r_by_l(Ax, Ay, Mz):
 
 verification = [map(lambda x: (P_r_by_l(x[0], x[1], x[2])), axis_value_set) for axis_value_set in axis_values ]
 
+__sum = reduce(lambda x, y: (x + y), axis_values[0])
+__sum = __sum / len(axis_values[0])
+print __sum
+print solve_Ax_Ay_Mz((numpy.matrix((0, 0, 0))).T)
+# print P_r_by_l(__sum[0], __sum[1], __sum[2])
 
+# print axis_values[0][0]
+print circle_fit.circle_fit(axis_values[0])
 
 # verification : take Ax, Ay, Mz forward kinematic to verify P_r
 #Ax,Ay fitted center Ax_bar,Ay_bar
