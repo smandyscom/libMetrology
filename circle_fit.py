@@ -51,9 +51,10 @@ def circle_fit_3d(point_set):
 
     # solve circle
     coeff = reduce(lambda y, z : numpy.vstack((y, z)), map(gen_coeff_vector, point_set_new_frame))
-    a, b1, b2, c = solve_right_singular_vector(coeff)
+    coeff_vector = solve_right_singular_vector(coeff)
+    a, b1, b2, c = tuple([coeff_vector[_index, 0] for _index in range(0, 4)])
 
-    center_new_frame = numpy.matrix((-b1/(2*a), -b2/(2*a), 0, 1)).T
+    center_new_frame = (numpy.matrix((-b1/(2*a), -b2/(2*a), 0, 1))).T
     center_origin_frame = T_new_origin * center_new_frame
 
     return center_origin_frame
